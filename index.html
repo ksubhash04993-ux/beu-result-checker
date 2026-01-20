@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Subhash Kumar | BEU Result Checker</title>
+
+<style>
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#0f2027,#134e5e,#00c853);
+  font-family:Segoe UI,Arial;
+  color:#fff;
+}
+.card{
+  width:400px;
+  padding:30px;
+  border-radius:18px;
+  background:rgba(0,0,0,0.65);
+  box-shadow:0 0 30px rgba(0,255,170,0.6);
+}
+h1{
+  text-align:center;
+  color:#00ffae;
+  margin-bottom:4px;
+}
+h2{
+  text-align:center;
+  font-size:14px;
+  color:#4fc3f7;
+  margin-top:0;
+}
+input,select,button{
+  width:100%;
+  padding:11px;
+  margin-top:14px;
+  border-radius:8px;
+  border:none;
+  font-size:14px;
+}
+input,select{
+  background:#0f172a;
+  color:#fff;
+  border:1px solid #00ffae;
+}
+button{
+  background:linear-gradient(90deg,#00e5ff,#00c853);
+  font-weight:bold;
+  cursor:pointer;
+}
+.row{
+  display:flex;
+  gap:10px;
+}
+.status{
+  margin-top:12px;
+  font-size:12px;
+  text-align:center;
+  color:#00ffae;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h1>Subhash Kumar</h1>
+  <h2>GECWC | BEU Result Checker</h2>
+
+  <input type="number" id="regNo" placeholder="Registration Number">
+
+  <div class="row">
+    <button onclick="changeReg(-1)">−</button>
+    <button onclick="changeReg(1)">+</button>
+  </div>
+
+  <select id="semester">
+    <option value="">Select Semester</option>
+    <option value="1st">1st</option>
+    <option value="2nd">2nd</option>
+    <option value="3rd">3rd</option>
+    <option value="4th">4th</option>
+    <option value="5th">5th</option>
+    <option value="6th">6th</option>
+    <option value="7th">7th</option>
+    <option value="8th">8th</option>
+  </select>
+
+  <select id="session"></select>
+
+  <button onclick="checkResult()">Check Result</button>
+
+  <input type="text" id="resultUrl" readonly placeholder="Generated BEU Result URL">
+
+  <button onclick="copyURL()">Copy URL</button>
+
+  <div class="status">Result opens on official BEU website</div>
+</div>
+
+<script>
+// Auto session load
+const sessionSelect = document.getElementById("session");
+const year = new Date().getFullYear();
+for(let y=year; y>=year-6; y--){
+  const opt = document.createElement("option");
+  opt.value = y;
+  opt.text = y + "-" + (y+1);
+  sessionSelect.appendChild(opt);
+}
+
+// Semester to Roman
+const SEM_ROMAN = {
+  "1st":"I","2nd":"II","3rd":"III","4th":"IV",
+  "5th":"V","6th":"VI","7th":"VII","8th":"VIII"
+};
+
+function changeReg(step){
+  const r = document.getElementById("regNo");
+  if(!r.value) return;
+  r.value = parseInt(r.value) + step;
+}
+
+function copyURL(){
+  const u = document.getElementById("resultUrl");
+  if(!u.value){ alert("URL not generated"); return; }
+  u.select();
+  document.execCommand("copy");
+  alert("URL copied ✅");
+}
+
+function checkResult(){
+  const regNo = document.getElementById("regNo").value;
+  const sem = document.getElementById("semester").value;
+  const session = document.getElementById("session").value;
+
+  if(!regNo || !sem || !session){
+    alert("Fill all fields");
+    return;
+  }
+
+  if(regNo.length < 10){
+    alert("Invalid Registration Number");
+    return;
+  }
+
+  const semRoman = SEM_ROMAN[sem];
+  const odd = ["1st","3rd","5th","7th"];
+  const examHeld = odd.includes(sem)
+    ? "July/"+(parseInt(session)+1)
+    : "November/"+session;
+
+  const url = "https://beu-bih.ac.in/result-three?name=B.Tech.%20"+sem+"%20Semester%20Examination,%20"+session+"&semester="+semRoman+"&session="+session+"&regNo="+regNo+"&exam_held="+examHeld.replace("/","%2F");
+
+  document.getElementById("resultUrl").value = url;
+  window.open(url,"_blank");
+}
+</script>
+
+</body>
+</html>
